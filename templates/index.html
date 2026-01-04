@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold text-white mb-4">
+                        Smart Mobile Price Prediction
+                    </h1>
+                    <p class="lead text-white-50 mb-4">
+                        Get accurate price predictions and personalized recommendations using advanced AI technology.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#predict-section" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-calculator me-2"></i>Predict Price
+                        </a>
+                        <a href="#recommend-section" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-star me-2"></i>Get Recommendations
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image text-center">
+                    <i class="fas fa-mobile-alt hero-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="section-title">Why Choose MobilePredict?</h2>
+                <p class="section-subtitle">Advanced AI technology for accurate predictions</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>AI-Powered</h4>
+                    <p>Advanced machine learning algorithms trained on thousands of mobile devices.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Accurate Predictions</h4>
+                    <p>Get precise price estimates based on real market data and trends.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-recommendations"></i>
+                    </div>
+                    <h4>Smart Recommendations</h4>
+                    <p>Personalized mobile recommendations based on your preferences.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Price Prediction Section -->
+<section id="predict-section" class="predict-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Price Prediction</h2>
+                <p class="section-subtitle">Enter mobile specifications to get price prediction</p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="prediction-card">
+                    <form id="prediction-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Brand</label>
+                                <select class="form-select" name="brand" required>
+                                    <option value="">Select Brand</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="OnePlus">OnePlus</option>
+                                    <option value="Realme">Realme</option>
+                                    <option value="Vivo">Vivo</option>
+                                    <option value="Oppo">Oppo</option>
+                                    <option value="Google">Google</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="Nokia">Nokia</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Operating System</label>
+                                <select class="form-select" name="operating_system" required>
+                                    <option value="">Select OS</option>
+                                    <option value="Android">Android</option>
+                                    <option value="iOS">iOS</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Release Year</label>
+                                <select class="form-select" name="release_year" required>
+                                    <option value="">Select Year</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2018">2018</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Screen Size (inches)</label>
+                                <input type="number" class="form-control" name="screen_size" 
+                                       step="0.1" min="4" max="8" placeholder="e.g., 6.1" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">RAM (GB)</label>
+                                <select class="form-select" name="ram" required>
+                                    <option value="">Select RAM</option>
+                                    <option value="2048">2 GB</option>
+                                    <option value="3072">3 GB</option>
+                                    <option value="4096">4 GB</option>
+                                    <option value="6144">6 GB</option>
+                                    <option value="8192">8 GB</option>
+                                    <option value="12288">12 GB</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Storage (GB)</label>
+                                <select class="form-select" name="storage" required>
+                                    <option value="">Select Storage</option>
+                                    <option value="32">32 GB</option>
+                                    <option value="64">64 GB</option>
+                                    <option value="128">128 GB</option>
+                                    <option value="256">256 GB</option>
+                                    <option value="512">512 GB</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Battery (mAh)</label>
+                                <input type="number" class="form-control" name="battery" 
+                                       min="2000" max="6000" placeholder="e.g., 4000" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Processor</label>
+                                <select class="form-select" name="processor" required>
+                                    <option value="">Select Processor</option>
+                                    <option value="octa-core">Octa-core</option>
+                                    <option value="quad-core">Quad-core</option>
+                                    <option value="hexa-core">Hexa-core</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calculator me-2"></i>Predict Price
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Prediction Result -->
+                    <div id="prediction-result" class="prediction-result mt-4" style="display: none;">
+                        <div class="result-card">
+                            <h4 class="text-center mb-3">Predicted Price</h4>
+                            <div class="price-display">
+                                ₹<span id="predicted-price">0</span>
+                            </div>
+                            <p class="text-center text-muted mt-2">
+                                Based on current market trends and specifications
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recommendation Section -->
+<section id="recommend-section" class="recommend-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Find Your Perfect Mobile</h2>
+                <p class="section-subtitle">Enter your requirements to get personalized recommendations</p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="recommendation-card">
+                    <form id="recommendation-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Budget Range (₹)</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="budget_min" 
+                                               placeholder="Min (e.g., 10000)" min="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="budget_max" 
+                                               placeholder="Max (e.g., 25000)" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Preferred Brand (Optional)</label>
+                                <select class="form-select" name="brand">
+                                    <option value="">Any Brand</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="OnePlus">OnePlus</option>
+                                    <option value="Realme">Realme</option>
+                                    <option value="Vivo">Vivo</option>
+                                    <option value="Oppo">Oppo</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Operating System</label>
+                                <select class="form-select" name="operating_system">
+                                    <option value="">Any OS</option>
+                                    <option value="Android">Android</option>
+                                    <option value="iOS">iOS</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum RAM (GB)</label>
+                                <select class="form-select" name="ram">
+                                    <option value="0">Any RAM</option>
+                                    <option value="3">3 GB or more</option>
+                                    <option value="4">4 GB or more</option>
+                                    <option value="6">6 GB or more</option>
+                                    <option value="8">8 GB or more</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum Storage (GB)</label>
+                                <select class="form-select" name="storage">
+                                    <option value="0">Any Storage</option>
+                                    <option value="32">32 GB or more</option>
+                                    <option value="64">64 GB or more</option>
+                                    <option value="128">128 GB or more</option>
+                                    <option value="256">256 GB or more</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum Battery (mAh)</label>
+                                <select class="form-select" name="battery">
+                                    <option value="0">Any Battery</option>
+                                    <option value="3000">3000 mAh or more</option>
+                                    <option value="4000">4000 mAh or more</option>
+                                    <option value="5000">5000 mAh or more</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-search me-2"></i>Find My Mobile
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Recommendations Result -->
+                    <div id="recommendations-result" class="recommendations-result mt-4" style="display: none;">
+                        <h4 class="text-center mb-4">Recommended Mobiles</h4>
+                        <div id="recommendations-list" class="recommendations-list">
+                            <!-- Recommendations will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
