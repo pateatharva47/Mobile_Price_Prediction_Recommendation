@@ -97,8 +97,8 @@ function initPredictionForm() {
                 } else {
                     showNotification('Error: ' + (result.error || 'Unknown error'), 'error');
                 }
-            } catch (error) {
-                showNotification('Network error. Please try again.', 'error');
+            } catch(error) {
+                showNotification('Network error. Please try again.','error');
             }
         });
     }
@@ -156,8 +156,8 @@ function initRecommendationForm() {
                 } else {
                     showNotification('Error: ' + (result.error || 'Unknown error'), 'error');
                 }
-            } catch (error) {
-                showNotification('Network error. Please try again.', 'error');
+            } catch(error){
+                showNotification('Network error. Please try again.','error');
             }
         });
     }
@@ -214,7 +214,7 @@ function formatIndianPrice(price) {
     const lastThree = numStr.substring(numStr.length - 3);
     const otherNumbers = numStr.substring(0, numStr.length - 3);
     
-    if (otherNumbers !== '') {
+    if (otherNumbers) {
         return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree;
     } else {
         return lastThree;
