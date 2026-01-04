@@ -6,7 +6,13 @@ Simple script to start the Flask application
 
 import os
 import sys
-from app import app, price_model, recommendation_rules
+
+try:
+    from app import app, price_model, recommendation_rules
+except ImportError as e:
+    print(f"Import error: {e}")
+    print("Make sure app.py is in the same directory")
+    sys.exit(1)
 
 if __name__ == '__main__':
     print("=" * 60)
