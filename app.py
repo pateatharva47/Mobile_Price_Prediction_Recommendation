@@ -8,15 +8,22 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
+import threading
+from functools import lru_cache
+import time
 
 warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 price_model = None
 recommendation_rules = None
 mobile_database = None
+model_lock = threading.Lock()
+model_loaded = False
 
 def create_smart_model():
     class SmartMobilePriceModel:
@@ -75,47 +82,47 @@ def create_smart_model():
     return SmartMobilePriceModel()
 
 def load_models():
-    global price_model, recommendation_rules, mobile_database
-    try:
-        print("Loading models...")
-        data_path = "data/cleaned_data1 (1).csv"
-        if os.path.exists(data_path):
-            print("Loading training data...")
-            df = pd.read_csv(data_path)
-            mobile_database = df
-            X = df[['Brand','operating_system','Processor','Release_year',
-                    'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
-            y = df['Price_in_India']
-            categorical_cols = ['Brand','operating_system','Processor']
-            preprocessor = ColumnTransformer([
-                ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
-            ], remainder='passthrough')
-            pipeline = Pipeline([
-                ('preprocess', preprocessor),
-                ('model', RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1))
-            ])
-            print("Training model...")
-            pipeline.fit(X, y)
-            price_model = pipeline
-            print("Model trained successfully!")
-        else:
-            print("Using fallback model")
-            price_model = create_smart_model()
-        rules_path = "Models/fpgrowth_rules.pkl"
-        if os.path.exists(rules_path):
-            try:
-                with open(rules_path, "rb") as f:
-                    recommendation_rules = pickle.load(f)
-                print("Recommendation rules loaded!")
-            except Exception:
+    global price_model, recommendation_rules, mobile_database, model_loaded
+    
+    with model_lock:
+        if model_loaded:
+            return price_model, recommendation_rules
+            
+        try:
+            print("Loading models...")
+            
+            # Try to load pre-trained model first
+            model_path = "Models/mobile_price_model (1).pkl"
+            if os.path.exists(model_path):
+                print("Loading pre-trained model...")
+                with open(model_path, "rb") as f:
+                    price_model = pickle.load(f)
+                print("Pre-trained model loaded!")
+            else:
+                # Fallback to lightweight model
+                print("Using lightweight fallback model")
+                price_model = create_smart_model()
+            
+            # Load recommendation rules
+            rules_path = "Models/fpgrowth_rules.pkl"
+            if os.path.exists(rules_path):
+                try:
+                    with open(rules_path, "rb") as f:
+                        recommendation_rules = pickle.load(f)
+                    print("Recommendation rules loaded!")
+                except Exception:
+                    recommendation_rules = None
+            else:
                 recommendation_rules = None
-        else:
-            recommendation_rules = None
-        return price_model, recommendation_rules
-    except Exception as e:
-        print(f"Error loading models: {e}")
-        price_model = create_smart_model()
-        return price_model, None
+                
+            model_loaded = True
+            return price_model, recommendation_rules
+            
+        except Exception as e:
+            print(f"Error loading models: {e}")
+            price_model = create_smart_model()
+            model_loaded = True
+            return price_model, None
 
 def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os='', min_ram=0, min_storage=0, min_battery=0):
     # Complete mobile database with all brands
@@ -123,10 +130,30 @@ def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os=
         'Apple': [
             {'recommended_item': 'iPhone 15 Pro Max', 'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 4441mAh Battery', 'price': '₹1,59,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
             {'recommended_item': 'iPhone 15 Pro', 'specifications': '6.1" Display, 8GB RAM, 128GB Storage, 3274mAh Battery', 'price': '₹1,34,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 15', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3349mAh Battery', 'price': '₹79,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 14 Pro Max', 'specifications': '6.7" Display, 6GB RAM, 128GB Storage, 4323mAh Battery', 'price': '₹1,39,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
             {'recommended_item': 'iPhone 14 Pro', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3200mAh Battery', 'price': '₹1,29,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 14 Plus', 'specifications': '6.7" Display, 6GB RAM, 128GB Storage, 4325mAh Battery', 'price': '₹89,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
             {'recommended_item': 'iPhone 14', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3279mAh Battery', 'price': '₹79,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 13 Pro Max', 'specifications': '6.7" Display, 6GB RAM, 128GB Storage, 4352mAh Battery', 'price': '₹1,19,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 13 Pro', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3095mAh Battery', 'price': '₹1,09,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
             {'recommended_item': 'iPhone 13', 'specifications': '6.1" Display, 4GB RAM, 128GB Storage, 3240mAh Battery', 'price': '₹69,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
-            {'recommended_item': 'iPhone SE 3rd Gen', 'specifications': '4.7" Display, 4GB RAM, 64GB Storage, 2018mAh Battery', 'price': '₹43,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'}
+            {'recommended_item': 'iPhone 13 mini', 'specifications': '5.4" Display, 4GB RAM, 128GB Storage, 2438mAh Battery', 'price': '₹59,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 12 Pro Max', 'specifications': '6.7" Display, 6GB RAM, 128GB Storage, 3687mAh Battery', 'price': '₹99,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 12 Pro', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 2815mAh Battery', 'price': '₹89,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 12', 'specifications': '6.1" Display, 4GB RAM, 64GB Storage, 2815mAh Battery', 'price': '₹59,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 12 mini', 'specifications': '5.4" Display, 4GB RAM, 64GB Storage, 2227mAh Battery', 'price': '₹49,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone SE 3rd Gen', 'specifications': '4.7" Display, 4GB RAM, 64GB Storage, 2018mAh Battery', 'price': '₹43,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 11 Pro Max', 'specifications': '6.5" Display, 4GB RAM, 64GB Storage, 3969mAh Battery', 'price': '₹79,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 11 Pro', 'specifications': '5.8" Display, 4GB RAM, 64GB Storage, 3046mAh Battery', 'price': '₹69,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 11', 'specifications': '6.1" Display, 4GB RAM, 64GB Storage, 3110mAh Battery', 'price': '₹49,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone XR', 'specifications': '6.1" Display, 3GB RAM, 64GB Storage, 2942mAh Battery', 'price': '₹39,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone XS', 'specifications': '5.8" Display, 4GB RAM, 64GB Storage, 2658mAh Battery', 'price': '₹35,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone X (Refurbished)', 'specifications': '5.8" Display, 3GB RAM, 64GB Storage, 2716mAh Battery', 'price': '₹29,900', 'price_range': 'Budget', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 8 Plus (Refurbished)', 'specifications': '5.5" Display, 3GB RAM, 64GB Storage, 2691mAh Battery', 'price': '₹25,900', 'price_range': 'Budget', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 8 (Refurbished)', 'specifications': '4.7" Display, 2GB RAM, 64GB Storage, 1821mAh Battery', 'price': '₹19,900', 'price_range': 'Budget', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 7 Plus (Refurbished)', 'specifications': '5.5" Display, 3GB RAM, 32GB Storage, 2900mAh Battery', 'price': '₹15,900', 'price_range': 'Budget', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 7 (Refurbished)', 'specifications': '4.7" Display, 2GB RAM, 32GB Storage, 1960mAh Battery', 'price': '₹12,900', 'price_range': 'Budget', 'brand': 'Apple', 'os': 'iOS'}
         ],
         'Samsung': [
             {'recommended_item': 'Samsung Galaxy S24 Ultra', 'specifications': '6.8" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹1,29,999', 'price_range': 'Ultra Premium', 'brand': 'Samsung', 'os': 'Android'},
@@ -239,32 +266,53 @@ def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os=
     
     return mixed_recommendations[:10] if mixed_recommendations else list(all_recommendations['Samsung'])[:8]
 
-load_models()
+# Health check endpoint for Render
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'healthy', 'timestamp': time.time()})
 
 @app.route('/')
 def home():
+    # Lazy load models on first request
+    if not model_loaded:
+        load_models()
     return render_template('index.html')
+
+@lru_cache(maxsize=1000)
+def cached_prediction(brand, os, processor, year, screen_size, storage, battery, ram):
+    """Cache predictions for identical inputs"""
+    input_data = pd.DataFrame([{
+        'Brand': brand,
+        'operating_system': os,
+        'Processor': processor,
+        'Release_year': year,
+        'Screen-size': screen_size,
+        'Internal_storage(GB)': storage,
+        'Battery(mah)': battery,
+        'RAM': ram
+    }])
+    
+    if price_model:
+        prediction = price_model.predict(input_data)
+        return float(prediction[0])
+    return 25000.0
 
 @app.route('/predict', methods=['POST'])
 def predict_price():
     try:
         data = request.get_json()
-        input_data = pd.DataFrame([{
-            'Brand': data['brand'],
-            'operating_system': data['operating_system'],
-            'Processor': data['processor'],
-            'Release_year': int(data['release_year']),
-            'Screen-size': float(data['screen_size']),
-            'Internal_storage(GB)': int(data['storage']),
-            'Battery(mah)': int(data['battery']),
-            'RAM': int(data['ram'])
-        }])
         
-        if price_model:
-            prediction = price_model.predict(input_data)
-            predicted_price = float(prediction[0])
-        else:
-            predicted_price = 25000
+        # Use cached prediction
+        predicted_price = cached_prediction(
+            data['brand'],
+            data['operating_system'], 
+            data['processor'],
+            int(data['release_year']),
+            float(data['screen_size']),
+            int(data['storage']),
+            int(data['battery']),
+            int(data['ram'])
+        )
         
         return jsonify({
             'success': True,
@@ -275,6 +323,13 @@ def predict_price():
             'success': False,
             'error': str(e)
         }), 400
+
+@lru_cache(maxsize=500)
+def cached_recommendations(budget_min, budget_max, brand, os, min_ram, min_storage, min_battery):
+    """Cache recommendations for identical criteria"""
+    return create_mobile_recommendations(
+        budget_min, budget_max, brand, os, min_ram, min_storage, min_battery
+    )
 
 @app.route('/recommend', methods=['POST'])
 def recommend_mobiles():
@@ -288,7 +343,7 @@ def recommend_mobiles():
         min_storage = int(data.get('storage', 0))
         min_battery = int(data.get('battery', 0))
         
-        recommendations = create_mobile_recommendations(
+        recommendations = cached_recommendations(
             budget_min, budget_max, brand, os, min_ram, min_storage, min_battery
         )
         
