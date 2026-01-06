@@ -91,17 +91,38 @@ def load_models():
         try:
             print("Loading models...")
             
-            # Try to load pre-trained model first
+            # First try to load the pre-trained model
             model_path = "Models/mobile_price_model (1).pkl"
             if os.path.exists(model_path):
-                print("Loading pre-trained model...")
+                print("Loading pre-trained model from pickle file...")
                 with open(model_path, "rb") as f:
                     price_model = pickle.load(f)
-                print("Pre-trained model loaded!")
+                print("Pre-trained model loaded successfully!")
             else:
-                # Fallback to lightweight model
-                print("Using lightweight fallback model")
-                price_model = create_smart_model()
+                # If pickle file doesn't exist, train a new model
+                data_path = "data/cleaned_data1 (1).csv"
+                if os.path.exists(data_path):
+                    print("Training new model from data...")
+                    df = pd.read_csv(data_path)
+                    mobile_database = df
+                    X = df[['Brand','operating_system','Processor','Release_year',
+                            'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
+                    y = df['Price_in_India']
+                    categorical_cols = ['Brand','operating_system','Processor']
+                    preprocessor = ColumnTransformer([
+                        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
+                    ], remainder='passthrough')
+                    pipeline = Pipeline([
+                        ('preprocess', preprocessor),
+                        ('model', RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1))
+                    ])
+                    print("Training model...")
+                    pipeline.fit(X, y)
+                    price_model = pipeline
+                    print("Model trained successfully!")
+                else:
+                    print("No data file found, using fallback model")
+                    price_model = create_smart_model()
             
             # Load recommendation rules
             rules_path = "Models/fpgrowth_rules.pkl"
