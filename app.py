@@ -118,216 +118,126 @@ def load_models():
         return price_model, None
 
 def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os='', min_ram=0, min_storage=0, min_battery=0):
-    # Always return fallback recommendations that work
-    recommendations = [
-        # Premium Apple phones
-        {
-            'recommended_item': 'iPhone 15 Pro Max',
-            'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 4441mAh Battery',
-            'price': '₹1,59,900',
-            'price_range': 'Ultra Premium',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        {
-            'recommended_item': 'iPhone 15 Pro',
-            'specifications': '6.1" Display, 8GB RAM, 128GB Storage, 3274mAh Battery',
-            'price': '₹1,34,900',
-            'price_range': 'Ultra Premium',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        {
-            'recommended_item': 'iPhone 14 Pro',
-            'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3200mAh Battery',
-            'price': '₹1,29,900',
-            'price_range': 'Ultra Premium',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        {
-            'recommended_item': 'iPhone 14',
-            'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3279mAh Battery',
-            'price': '₹79,900',
-            'price_range': 'Premium',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        {
-            'recommended_item': 'iPhone 13',
-            'specifications': '6.1" Display, 4GB RAM, 128GB Storage, 3240mAh Battery',
-            'price': '₹69,900',
-            'price_range': 'Premium',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        # Premium Samsung phones
-        {
-            'recommended_item': 'Samsung Galaxy S24 Ultra',
-            'specifications': '6.8" Display, 12GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹1,29,999',
-            'price_range': 'Ultra Premium',
-            'brand': 'Samsung',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Samsung Galaxy S23 Ultra',
-            'specifications': '6.8" Display, 12GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹1,24,999',
-            'price_range': 'Ultra Premium',
-            'brand': 'Samsung',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Samsung Galaxy Z Fold 5',
-            'specifications': '7.6" Foldable Display, 12GB RAM, 256GB Storage, 4400mAh Battery',
-            'price': '₹1,54,999',
-            'price_range': 'Ultra Premium',
-            'brand': 'Samsung',
-            'os': 'Android'
-        },
-        # Premium OnePlus phones
-        {
-            'recommended_item': 'OnePlus 12',
-            'specifications': '6.82" Display, 16GB RAM, 512GB Storage, 5400mAh Battery',
-            'price': '₹69,999',
-            'price_range': 'Premium',
-            'brand': 'OnePlus',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'OnePlus 11',
-            'specifications': '6.7" Display, 12GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹56,999',
-            'price_range': 'Premium',
-            'brand': 'OnePlus',
-            'os': 'Android'
-        },
-        # Premium Google phones
-        {
-            'recommended_item': 'Google Pixel 8 Pro',
-            'specifications': '6.7" Display, 12GB RAM, 128GB Storage, 5050mAh Battery',
-            'price': '₹1,06,999',
-            'price_range': 'Ultra Premium',
-            'brand': 'Google',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Google Pixel 8',
-            'specifications': '6.2" Display, 8GB RAM, 128GB Storage, 4575mAh Battery',
-            'price': '₹75,999',
-            'price_range': 'Premium',
-            'brand': 'Google',
-            'os': 'Android'
-        },
-        # Mid-range phones
-        {
-            'recommended_item': 'Samsung Galaxy A54 5G',
-            'specifications': '6.4" Display, 8GB RAM, 128GB Storage, 5000mAh Battery',
-            'price': '₹38,999',
-            'price_range': 'Mid-range',
-            'brand': 'Samsung',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'iPhone SE 3rd Gen',
-            'specifications': '4.7" Display, 4GB RAM, 64GB Storage, 2018mAh Battery',
-            'price': '₹43,900',
-            'price_range': 'Mid-range',
-            'brand': 'Apple',
-            'os': 'iOS'
-        },
-        # Poco phones
-        {
-            'recommended_item': 'Poco X5 Pro',
-            'specifications': '6.67" Display, 8GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹22,999',
-            'price_range': 'Budget',
-            'brand': 'Poco',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Poco F5',
-            'specifications': '6.67" Display, 12GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹29,999',
-            'price_range': 'Mid-range',
-            'brand': 'Poco',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Poco M5',
-            'specifications': '6.58" Display, 6GB RAM, 128GB Storage, 5000mAh Battery',
-            'price': '₹12,999',
-            'price_range': 'Budget',
-            'brand': 'Poco',
-            'os': 'Android'
-        },
-        # Lenovo phones
-        {
-            'recommended_item': 'Lenovo Legion Phone Duel',
-            'specifications': '6.65" Display, 12GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹49,999',
-            'price_range': 'Premium',
-            'brand': 'Lenovo',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Lenovo K13 Note',
-            'specifications': '6.5" Display, 4GB RAM, 64GB Storage, 5000mAh Battery',
-            'price': '₹9,999',
-            'price_range': 'Budget',
-            'brand': 'Lenovo',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Xiaomi Redmi Note 12 Pro',
-            'specifications': '6.67" Display, 6GB RAM, 128GB Storage, 5000mAh Battery',
-            'price': '₹23,999',
-            'price_range': 'Budget',
-            'brand': 'Xiaomi',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'OnePlus Nord CE 3 Lite',
-            'specifications': '6.72" Display, 8GB RAM, 128GB Storage, 5000mAh Battery',
-            'price': '₹19,999',
-            'price_range': 'Budget',
-            'brand': 'OnePlus',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Realme 11 Pro',
-            'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 5000mAh Battery',
-            'price': '₹25,999',
-            'price_range': 'Mid-range',
-            'brand': 'Realme',
-            'os': 'Android'
-        },
-        {
-            'recommended_item': 'Vivo V27',
-            'specifications': '6.78" Display, 8GB RAM, 128GB Storage, 4600mAh Battery',
-            'price': '₹32,999',
-            'price_range': 'Mid-range',
-            'brand': 'Vivo',
-            'os': 'Android'
-        }
-    ]
+    # Complete mobile database with all brands
+    all_recommendations = {
+        'Apple': [
+            {'recommended_item': 'iPhone 15 Pro Max', 'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 4441mAh Battery', 'price': '₹1,59,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 15 Pro', 'specifications': '6.1" Display, 8GB RAM, 128GB Storage, 3274mAh Battery', 'price': '₹1,34,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 14 Pro', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3200mAh Battery', 'price': '₹1,29,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 14', 'specifications': '6.1" Display, 6GB RAM, 128GB Storage, 3279mAh Battery', 'price': '₹79,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone 13', 'specifications': '6.1" Display, 4GB RAM, 128GB Storage, 3240mAh Battery', 'price': '₹69,900', 'price_range': 'Premium', 'brand': 'Apple', 'os': 'iOS'},
+            {'recommended_item': 'iPhone SE 3rd Gen', 'specifications': '4.7" Display, 4GB RAM, 64GB Storage, 2018mAh Battery', 'price': '₹43,900', 'price_range': 'Mid-range', 'brand': 'Apple', 'os': 'iOS'}
+        ],
+        'Samsung': [
+            {'recommended_item': 'Samsung Galaxy S24 Ultra', 'specifications': '6.8" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹1,29,999', 'price_range': 'Ultra Premium', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy S23 Ultra', 'specifications': '6.8" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹1,24,999', 'price_range': 'Ultra Premium', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy Z Fold 5', 'specifications': '7.6" Foldable Display, 12GB RAM, 256GB Storage, 4400mAh Battery', 'price': '₹1,54,999', 'price_range': 'Ultra Premium', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy S23 FE', 'specifications': '6.4" Display, 8GB RAM, 128GB Storage, 4500mAh Battery', 'price': '₹59,999', 'price_range': 'Premium', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A54 5G', 'specifications': '6.4" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹38,999', 'price_range': 'Mid-range', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A34 5G', 'specifications': '6.6" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹30,999', 'price_range': 'Mid-range', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy M54 5G', 'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 6000mAh Battery', 'price': '₹26,999', 'price_range': 'Mid-range', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A24', 'specifications': '6.5" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹22,999', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy M34 5G', 'specifications': '6.5" Display, 6GB RAM, 128GB Storage, 6000mAh Battery', 'price': '₹18,999', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A14 5G', 'specifications': '6.6" Display, 4GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹16,499', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy M14 5G', 'specifications': '6.6" Display, 4GB RAM, 128GB Storage, 6000mAh Battery', 'price': '₹13,490', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A04s', 'specifications': '6.5" Display, 4GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹11,499', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'},
+            {'recommended_item': 'Samsung Galaxy A04e', 'specifications': '6.5" Display, 3GB RAM, 32GB Storage, 5000mAh Battery', 'price': '₹9,499', 'price_range': 'Budget', 'brand': 'Samsung', 'os': 'Android'}
+        ],
+        'OnePlus': [
+            {'recommended_item': 'OnePlus 12', 'specifications': '6.82" Display, 16GB RAM, 512GB Storage, 5400mAh Battery', 'price': '₹69,999', 'price_range': 'Premium', 'brand': 'OnePlus', 'os': 'Android'},
+            {'recommended_item': 'OnePlus 11', 'specifications': '6.7" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹56,999', 'price_range': 'Premium', 'brand': 'OnePlus', 'os': 'Android'},
+            {'recommended_item': 'OnePlus 11R', 'specifications': '6.74" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹39,999', 'price_range': 'Mid-range', 'brand': 'OnePlus', 'os': 'Android'},
+            {'recommended_item': 'OnePlus Nord CE 3 Lite', 'specifications': '6.72" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹19,999', 'price_range': 'Budget', 'brand': 'OnePlus', 'os': 'Android'},
+            {'recommended_item': 'OnePlus Nord CE 3', 'specifications': '6.7" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹26,999', 'price_range': 'Mid-range', 'brand': 'OnePlus', 'os': 'Android'}
+        ],
+        'Oppo': [
+            {'recommended_item': 'Oppo Find X6 Pro', 'specifications': '6.82" Display, 16GB RAM, 512GB Storage, 5000mAh Battery', 'price': '₹89,999', 'price_range': 'Premium', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo Reno 10 Pro+', 'specifications': '6.74" Display, 12GB RAM, 256GB Storage, 4700mAh Battery', 'price': '₹54,999', 'price_range': 'Premium', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo Reno 10 Pro', 'specifications': '6.7" Display, 12GB RAM, 256GB Storage, 4600mAh Battery', 'price': '₹39,999', 'price_range': 'Mid-range', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo Reno 8T 5G', 'specifications': '6.43" Display, 8GB RAM, 128GB Storage, 4800mAh Battery', 'price': '₹29,999', 'price_range': 'Mid-range', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo F23 5G', 'specifications': '6.72" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹24,999', 'price_range': 'Mid-range', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo A98 5G', 'specifications': '6.72" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹23,999', 'price_range': 'Budget', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo A78 5G', 'specifications': '6.56" Display, 8GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹18,999', 'price_range': 'Budget', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo A58 5G', 'specifications': '6.72" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹15,999', 'price_range': 'Budget', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo A17k', 'specifications': '6.56" Display, 3GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹12,999', 'price_range': 'Budget', 'brand': 'Oppo', 'os': 'Android'},
+            {'recommended_item': 'Oppo A16k', 'specifications': '6.52" Display, 3GB RAM, 32GB Storage, 4230mAh Battery', 'price': '₹10,999', 'price_range': 'Budget', 'brand': 'Oppo', 'os': 'Android'}
+        ],
+        'Xiaomi': [
+            {'recommended_item': 'Xiaomi 13 Pro', 'specifications': '6.73" Display, 12GB RAM, 256GB Storage, 4820mAh Battery', 'price': '₹79,999', 'price_range': 'Premium', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi 13', 'specifications': '6.36" Display, 8GB RAM, 128GB Storage, 4500mAh Battery', 'price': '₹54,999', 'price_range': 'Premium', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi 12 Pro', 'specifications': '6.73" Display, 8GB RAM, 256GB Storage, 4600mAh Battery', 'price': '₹39,999', 'price_range': 'Mid-range', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi Note 12 Pro+', 'specifications': '6.67" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹30,999', 'price_range': 'Mid-range', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi Note 12 Pro', 'specifications': '6.67" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹23,999', 'price_range': 'Budget', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi Note 12', 'specifications': '6.67" Display, 4GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹17,999', 'price_range': 'Budget', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi 12 5G', 'specifications': '6.79" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹13,999', 'price_range': 'Budget', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi 12C', 'specifications': '6.71" Display, 4GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹10,999', 'price_range': 'Budget', 'brand': 'Xiaomi', 'os': 'Android'},
+            {'recommended_item': 'Xiaomi Redmi A2+', 'specifications': '6.52" Display, 3GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹8,999', 'price_range': 'Budget', 'brand': 'Xiaomi', 'os': 'Android'}
+        ],
+        'Poco': [
+            {'recommended_item': 'Poco F5 Pro', 'specifications': '6.67" Display, 12GB RAM, 512GB Storage, 5160mAh Battery', 'price': '₹36,999', 'price_range': 'Mid-range', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco F5', 'specifications': '6.67" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹29,999', 'price_range': 'Mid-range', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco X5 Pro', 'specifications': '6.67" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹22,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco X5', 'specifications': '6.67" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹18,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco M5s', 'specifications': '6.43" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹14,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco M5', 'specifications': '6.58" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹12,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco C55', 'specifications': '6.71" Display, 4GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹9,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'},
+            {'recommended_item': 'Poco C50', 'specifications': '6.52" Display, 3GB RAM, 32GB Storage, 5000mAh Battery', 'price': '₹7,999', 'price_range': 'Budget', 'brand': 'Poco', 'os': 'Android'}
+        ],
+        'Lenovo': [
+            {'recommended_item': 'Lenovo Legion Phone Duel', 'specifications': '6.65" Display, 12GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹49,999', 'price_range': 'Premium', 'brand': 'Lenovo', 'os': 'Android'},
+            {'recommended_item': 'Lenovo K13 Note', 'specifications': '6.5" Display, 4GB RAM, 64GB Storage, 5000mAh Battery', 'price': '₹9,999', 'price_range': 'Budget', 'brand': 'Lenovo', 'os': 'Android'},
+            {'recommended_item': 'Lenovo A7', 'specifications': '6.09" Display, 2GB RAM, 32GB Storage, 4000mAh Battery', 'price': '₹6,999', 'price_range': 'Budget', 'brand': 'Lenovo', 'os': 'Android'}
+        ],
+        'Vivo': [
+            {'recommended_item': 'Vivo X90 Pro', 'specifications': '6.78" Display, 12GB RAM, 256GB Storage, 4870mAh Battery', 'price': '₹84,999', 'price_range': 'Premium', 'brand': 'Vivo', 'os': 'Android'},
+            {'recommended_item': 'Vivo V27 Pro', 'specifications': '6.78" Display, 12GB RAM, 256GB Storage, 4600mAh Battery', 'price': '₹37,999', 'price_range': 'Mid-range', 'brand': 'Vivo', 'os': 'Android'},
+            {'recommended_item': 'Vivo V27', 'specifications': '6.78" Display, 8GB RAM, 128GB Storage, 4600mAh Battery', 'price': '₹32,999', 'price_range': 'Mid-range', 'brand': 'Vivo', 'os': 'Android'},
+            {'recommended_item': 'Vivo T2 5G', 'specifications': '6.38" Display, 8GB RAM, 128GB Storage, 4500mAh Battery', 'price': '₹18,999', 'price_range': 'Budget', 'brand': 'Vivo', 'os': 'Android'},
+            {'recommended_item': 'Vivo Y27 5G', 'specifications': '6.64" Display, 6GB RAM, 128GB Storage, 5000mAh Battery', 'price': '₹15,999', 'price_range': 'Budget', 'brand': 'Vivo', 'os': 'Android'}
+        ],
+        'Realme': [
+            {'recommended_item': 'Realme GT 3', 'specifications': '6.74" Display, 16GB RAM, 1TB Storage, 4600mAh Battery', 'price': '₹56,999', 'price_range': 'Premium', 'brand': 'Realme', 'os': 'Android'},
+            {'recommended_item': 'Realme 11 Pro+', 'specifications': '6.7" Display, 12GB RAM, 512GB Storage, 5000mAh Battery', 'price': '₹29,999', 'price_range': 'Mid-range', 'brand': 'Realme', 'os': 'Android'},
+            {'recommended_item': 'Realme 11 Pro', 'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹25,999', 'price_range': 'Mid-range', 'brand': 'Realme', 'os': 'Android'},
+            {'recommended_item': 'Realme Narzo 60 Pro', 'specifications': '6.43" Display, 8GB RAM, 128GB Storage, 4300mAh Battery', 'price': '₹23,999', 'price_range': 'Budget', 'brand': 'Realme', 'os': 'Android'},
+            {'recommended_item': 'Realme C55', 'specifications': '6.72" Display, 8GB RAM, 256GB Storage, 5000mAh Battery', 'price': '₹13,999', 'price_range': 'Budget', 'brand': 'Realme', 'os': 'Android'}
+        ]
+    }
     
-    # Filter recommendations based on criteria
-    filtered = []
-    for mobile in recommendations:
-        price_num = int(mobile['price'].replace('₹', '').replace(',', ''))
+    # If specific brand is selected, only show that brand's phones
+    if brand and brand in all_recommendations:
+        brand_phones = all_recommendations[brand]
         
-        # Apply budget filter
-        if budget_min <= price_num <= budget_max:
-            # Apply brand filter
-            if not brand or mobile['brand'].lower() == brand.lower():
-                # Apply OS filter
+        # Check OS compatibility first
+        if os:
+            # Apple only supports iOS
+            if brand.lower() == 'apple' and os.lower() != 'ios':
+                return []  # No recommendations for Apple + Android
+            # All other brands only support Android
+            elif brand.lower() != 'apple' and os.lower() != 'android':
+                return []  # No recommendations for Android brands + iOS
+        
+        # Filter by budget and other criteria
+        filtered = []
+        for mobile in brand_phones:
+            price_num = int(mobile['price'].replace('₹', '').replace(',', ''))
+            
+            if budget_min <= price_num <= budget_max:
                 if not os or mobile['os'].lower() == os.lower():
                     filtered.append(mobile)
+        
+        return filtered[:10] if filtered else brand_phones[:8]
     
-    # Return filtered results or all if no matches
-    return filtered[:5] if filtered else recommendations[:5]
+    # If no brand selected, show mixed recommendations
+    mixed_recommendations = []
+    for brand_name, phones in all_recommendations.items():
+        for phone in phones[:2]:  # Take 2 phones from each brand
+            price_num = int(phone['price'].replace('₹', '').replace(',', ''))
+            if budget_min <= price_num <= budget_max:
+                if not os or phone['os'].lower() == os.lower():
+                    mixed_recommendations.append(phone)
+    
+    return mixed_recommendations[:10] if mixed_recommendations else list(all_recommendations['Samsung'])[:8]
 
 load_models()
 
