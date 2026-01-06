@@ -35,47 +35,42 @@ def load_models():
         try:
             print("Loading models...")
             
-            # Load the cleaned dataset and train the 88% accurate Random Forest model
-            data_path = "data/cleaned_data1 (1).csv"
-            
-            if os.path.exists(data_path):
-                print("Loading training data...")
-                df = pd.read_csv(data_path)
-                mobile_database = df
-                
-                # Prepare features exactly as in your trained model
-                X = df[['Brand','operating_system','Processor','Release_year',
-                        'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
-                y = df['Price_in_India']
-                
-                # Create the exact same preprocessing pipeline for 88% accuracy
-                categorical_cols = ['Brand','operating_system','Processor']
-                
-                preprocessor = ColumnTransformer([
-                    ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
-                ], remainder='passthrough')
-                
-                # Use the same Random Forest configuration that achieved 88% accuracy
-                pipeline = Pipeline([
-                    ('preprocess', preprocessor),
-                    ('model', RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1))
-                ])
-                
-                print("Training Random Forest model (88% accuracy)...")
-                pipeline.fit(X, y)
-                price_model = pipeline
-                print("88% accurate Random Forest model trained successfully!")
-                
+            # First try to load pre-trained model (fastest)
+            model_path = "Models/mobile_price_model (1).pkl"
+            if os.path.exists(model_path):
+                print("Loading pre-trained model...")
+                with open(model_path, "rb") as f:
+                    price_model = pickle.load(f)
+                print("Pre-trained model loaded!")
             else:
-                print(f"Training data not found: {data_path}")
-                # Try to load pre-trained model as fallback
-                model_path = "Models/mobile_price_model (1).pkl"
-                if os.path.exists(model_path):
-                    print("Loading pre-trained model...")
-                    with open(model_path, "rb") as f:
-                        price_model = pickle.load(f)
-                    print("Pre-trained model loaded!")
+                # Load dataset and train with reduced complexity for Render
+                data_path = "data/cleaned_data1 (1).csv"
+                if os.path.exists(data_path):
+                    print("Loading training data...")
+                    df = pd.read_csv(data_path)
+                    mobile_database = df
+                    
+                    X = df[['Brand','operating_system','Processor','Release_year',
+                            'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
+                    y = df['Price_in_India']
+                    
+                    categorical_cols = ['Brand','operating_system','Processor']
+                    preprocessor = ColumnTransformer([
+                        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
+                    ], remainder='passthrough')
+                    
+                    # Reduced model for Render deployment (faster training)
+                    pipeline = Pipeline([
+                        ('preprocess', preprocessor),
+                        ('model', RandomForestRegressor(n_estimators=30, random_state=42, n_jobs=1, max_depth=10))
+                    ])
+                    
+                    print("Training optimized model...")
+                    pipeline.fit(X, y)
+                    price_model = pipeline
+                    print("Model trained successfully!")
                 else:
+                    print("No data found, model will be None")
                     price_model = None
             
             # Load recommendation rules
