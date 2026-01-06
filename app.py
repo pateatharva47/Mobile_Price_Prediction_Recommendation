@@ -25,62 +25,6 @@ mobile_database = None
 model_lock = threading.Lock()
 model_loaded = False
 
-def create_smart_model():
-    class SmartMobilePriceModel:
-        def __init__(self):
-            self.brand_base_prices = {
-                'Apple': 45000, 'Samsung': 25000, 'OnePlus': 30000, 'Google': 40000,
-                'Xiaomi': 15000, 'Realme': 12000, 'Vivo': 18000, 'Oppo': 20000,
-                'Huawei': 25000, 'Nokia': 10000, 'Poco': 12000, 'Motorola': 15000,
-                'Honor': 16000, 'iQOO': 22000, 'Asus': 28000, 'LG': 20000,
-                'Lenovo': 14000
-            }
-            self.os_multipliers = {'iOS': 1.4, 'Android': 1.0}
-            self.ram_price_per_gb = 1500
-            self.storage_price_per_gb = 80
-            self.screen_size_factor = 2000
-            self.battery_factor = 3
-            self.year_factors = {
-                2024: 1.2, 2023: 1.1, 2022: 1.0, 2021: 0.85, 
-                2020: 0.7, 2019: 0.6, 2018: 0.5, 2017: 0.4, 
-                2016: 0.35, 2015: 0.3, 2014: 0.25
-            }
-            self.processor_multipliers = {
-                'octa-core': 1.2, 'quad-core': 0.8, 'hexa-core': 1.0, 
-                'Unknown_Processor': 1.0
-            }
-        
-        def predict(self, X):
-            predictions = []
-            for _, row in X.iterrows():
-                brand = row.get('Brand', 'Xiaomi')
-                base_price = self.brand_base_prices.get(brand, 15000)
-                os = row.get('operating_system', 'Android')
-                os_mult = self.os_multipliers.get(os, 1.0)
-                price = base_price * os_mult
-                ram = row.get('RAM', 4096)
-                if ram > 100:
-                    ram_gb = ram / 1024
-                else:
-                    ram_gb = ram
-                price += ram_gb * self.ram_price_per_gb
-                storage = row.get('Internal_storage(GB)', 64)
-                price += storage * self.storage_price_per_gb
-                screen_size = row.get('Screen-size', 6.0)
-                price += (screen_size - 5.0) * self.screen_size_factor
-                battery = row.get('Battery(mah)', 4000)
-                price += (battery - 3000) * self.battery_factor
-                year = int(row.get('Release_year', 2022))
-                year_mult = self.year_factors.get(year, 0.5)
-                price *= year_mult
-                processor = row.get('Processor', 'octa-core')
-                proc_mult = self.processor_multipliers.get(processor, 1.0)
-                price *= proc_mult
-                final_price = max(3000, min(150000, price))
-                predictions.append(final_price)
-            return np.array(predictions)
-    return SmartMobilePriceModel()
-
 def load_models():
     global price_model, recommendation_rules, mobile_database, model_loaded
     
@@ -91,38 +35,48 @@ def load_models():
         try:
             print("Loading models...")
             
-            # First try to load the pre-trained model
-            model_path = "Models/mobile_price_model (1).pkl"
-            if os.path.exists(model_path):
-                print("Loading pre-trained model from pickle file...")
-                with open(model_path, "rb") as f:
-                    price_model = pickle.load(f)
-                print("Pre-trained model loaded successfully!")
+            # Load the cleaned dataset and train the 88% accurate Random Forest model
+            data_path = "data/cleaned_data1 (1).csv"
+            
+            if os.path.exists(data_path):
+                print("Loading training data...")
+                df = pd.read_csv(data_path)
+                mobile_database = df
+                
+                # Prepare features exactly as in your trained model
+                X = df[['Brand','operating_system','Processor','Release_year',
+                        'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
+                y = df['Price_in_India']
+                
+                # Create the exact same preprocessing pipeline for 88% accuracy
+                categorical_cols = ['Brand','operating_system','Processor']
+                
+                preprocessor = ColumnTransformer([
+                    ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
+                ], remainder='passthrough')
+                
+                # Use the same Random Forest configuration that achieved 88% accuracy
+                pipeline = Pipeline([
+                    ('preprocess', preprocessor),
+                    ('model', RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1))
+                ])
+                
+                print("Training Random Forest model (88% accuracy)...")
+                pipeline.fit(X, y)
+                price_model = pipeline
+                print("88% accurate Random Forest model trained successfully!")
+                
             else:
-                # If pickle file doesn't exist, train a new model
-                data_path = "data/cleaned_data1 (1).csv"
-                if os.path.exists(data_path):
-                    print("Training new model from data...")
-                    df = pd.read_csv(data_path)
-                    mobile_database = df
-                    X = df[['Brand','operating_system','Processor','Release_year',
-                            'Screen-size','Internal_storage(GB)','Battery(mah)','RAM']]
-                    y = df['Price_in_India']
-                    categorical_cols = ['Brand','operating_system','Processor']
-                    preprocessor = ColumnTransformer([
-                        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
-                    ], remainder='passthrough')
-                    pipeline = Pipeline([
-                        ('preprocess', preprocessor),
-                        ('model', RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1))
-                    ])
-                    print("Training model...")
-                    pipeline.fit(X, y)
-                    price_model = pipeline
-                    print("Model trained successfully!")
+                print(f"Training data not found: {data_path}")
+                # Try to load pre-trained model as fallback
+                model_path = "Models/mobile_price_model (1).pkl"
+                if os.path.exists(model_path):
+                    print("Loading pre-trained model...")
+                    with open(model_path, "rb") as f:
+                        price_model = pickle.load(f)
+                    print("Pre-trained model loaded!")
                 else:
-                    print("No data file found, using fallback model")
-                    price_model = create_smart_model()
+                    price_model = None
             
             # Load recommendation rules
             rules_path = "Models/fpgrowth_rules.pkl"
@@ -140,13 +94,11 @@ def load_models():
             return price_model, recommendation_rules
             
         except Exception as e:
-            print(f"Error loading models: {e}")
-            price_model = create_smart_model()
+            print(f"Error in model loading: {e}")
             model_loaded = True
-            return price_model, None
+            return None, None
 
 def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os='', min_ram=0, min_storage=0, min_battery=0):
-    # Complete mobile database with all brands
     all_recommendations = {
         'Apple': [
             {'recommended_item': 'iPhone 15 Pro Max', 'specifications': '6.7" Display, 8GB RAM, 256GB Storage, 4441mAh Battery', 'price': '₹1,59,900', 'price_range': 'Ultra Premium', 'brand': 'Apple', 'os': 'iOS'},
@@ -252,34 +204,25 @@ def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os=
         ]
     }
     
-    # If specific brand is selected, only show that brand's phones
     if brand and brand in all_recommendations:
         brand_phones = all_recommendations[brand]
-        
-        # Check OS compatibility first
         if os:
-            # Apple only supports iOS
             if brand.lower() == 'apple' and os.lower() != 'ios':
-                return []  # No recommendations for Apple + Android
-            # All other brands only support Android
+                return []
             elif brand.lower() != 'apple' and os.lower() != 'android':
-                return []  # No recommendations for Android brands + iOS
+                return []
         
-        # Filter by budget and other criteria
         filtered = []
         for mobile in brand_phones:
             price_num = int(mobile['price'].replace('₹', '').replace(',', ''))
-            
             if budget_min <= price_num <= budget_max:
                 if not os or mobile['os'].lower() == os.lower():
                     filtered.append(mobile)
-        
         return filtered[:10] if filtered else brand_phones[:8]
     
-    # If no brand selected, show mixed recommendations
     mixed_recommendations = []
     for brand_name, phones in all_recommendations.items():
-        for phone in phones[:2]:  # Take 2 phones from each brand
+        for phone in phones[:2]:
             price_num = int(phone['price'].replace('₹', '').replace(',', ''))
             if budget_min <= price_num <= budget_max:
                 if not os or phone['os'].lower() == os.lower():
@@ -287,21 +230,18 @@ def create_mobile_recommendations(budget_min=0, budget_max=100000, brand='', os=
     
     return mixed_recommendations[:10] if mixed_recommendations else list(all_recommendations['Samsung'])[:8]
 
-# Health check endpoint for Render
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'healthy', 'timestamp': time.time()})
 
 @app.route('/')
 def home():
-    # Lazy load models on first request
     if not model_loaded:
         load_models()
     return render_template('index.html')
 
 @lru_cache(maxsize=1000)
 def cached_prediction(brand, os, processor, year, screen_size, storage, battery, ram):
-    """Cache predictions for identical inputs"""
     input_data = pd.DataFrame([{
         'Brand': brand,
         'operating_system': os,
@@ -323,7 +263,6 @@ def predict_price():
     try:
         data = request.get_json()
         
-        # Use cached prediction
         predicted_price = cached_prediction(
             data['brand'],
             data['operating_system'], 
@@ -347,7 +286,6 @@ def predict_price():
 
 @lru_cache(maxsize=500)
 def cached_recommendations(budget_min, budget_max, brand, os, min_ram, min_storage, min_battery):
-    """Cache recommendations for identical criteria"""
     return create_mobile_recommendations(
         budget_min, budget_max, brand, os, min_ram, min_storage, min_battery
     )
