@@ -54,7 +54,7 @@ Uses **FP-Growth association rules** along with fallback logic for recommendatio
 
 ## 🏗️ Project Structure
 
-
+```bash
 Mobile_Price_Prediction_Recommendation/
 │── app.py # Main Flask application
 │── run.py # Application run file
@@ -85,7 +85,7 @@ Mobile_Price_Prediction_Recommendation/
 └── static/
 ├── css/
 └── js/
-
+```
 
 ---
 
@@ -95,65 +95,60 @@ Mobile_Price_Prediction_Recommendation/
 ```bash
 git clone https://github.com/pateatharva47/Mobile_Price_Prediction_Recommendation.git
 cd Mobile_Price_Prediction_Recommendation
+```
 
-✅ Step 2: Install Dependencies
+### ✅ Step 2: Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
-✅ Step 3: Run the Flask Application
+### ✅ Step 3: Run the Flask Application
+```bash
 python run.py
+```
 
 
-Then open your browser and go to:
+Then open your browser and go to: http://127.0.0.1:5000/
 
-http://127.0.0.1:5000/
-
-
-
-🌐 Deployment
-
-The project can be deployed on Render using:
-
-Python environment
-
-Start command: python run.py
-
-Public GitHub repository
-
-
-🧠 Model Information
-
-Algorithm: Random Forest Regressor
-
-Recommendation Technique: FP-Growth
-
-Dataset: Mobile specifications dataset
-
-Output:
-
-Predicted mobile price
-
-Top mobile recommendations
----
-
-📌 Key Highlights
-
-Fully working ML + Web application
-
-Offline model loading (no external API)
-
-Beginner-friendly code structure
-
-Suitable for academic submission
 
 ---
 
+## 🌐 Deployment
 
-✅ Submission Notes
+The project can be deployed on **Render** using the following configuration:
 
-Includes trained models
+- Python environment
+- Start command: `python run.py`
+- Public GitHub repository
 
-No external data download required
+---
 
-Ready for demo and deployment
+## 🧠 Model Information
 
-Simple and easy-to-understand implementation
+- Algorithm: Random Forest Regressor
+- Model Accuracy: ~88%
+- Recommendation Technique: FP-Growth
+
+### Output:
+- Predicted mobile price
+- Recommended mobile phones
+
+---
+
+## 📌 Key Points
+
+- Machine learning model is pre-trained
+- Model is loaded during runtime (no training on server)
+- Simple UI and easy to use
+- Suitable for academic projects and demonstrations
+
+---
+
+## ✅ Submission Notes
+
+- Includes trained model files
+- No external data download required
+- Ready for demo and deployment
+- Written in simple and understandable way
+
+
