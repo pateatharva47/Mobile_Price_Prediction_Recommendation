@@ -57,11 +57,11 @@ function initPredictionForm() {
             const data = {
                 brand: formData.get('brand'),
                 operating_system: formData.get('operating_system'),
-                release_year: formData.get('release_year'),
-                screen_size: formData.get('screen_size'),
-                ram: formData.get('ram'),
-                storage: formData.get('storage'),
-                battery: formData.get('battery'),
+                release_year: parseInt(formData.get('release_year')),
+                screen_size: parseFloat(formData.get('screen_size')),
+                ram: parseInt(formData.get('ram')), // Keep in MB as expected by backend
+                storage: parseInt(formData.get('storage')),
+                battery: parseInt(formData.get('battery')),
                 processor: formData.get('processor')
             };
             
